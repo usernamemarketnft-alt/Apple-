@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gifts test</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<style>
+body{margin:0;background:#141414;color:#fff;font-family:Arial,sans-serif}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px;max-width:480px;margin:auto}
+.g{aspect-ratio:1;border-radius:50%;background:#2a2a2d;display:flex;align-items:center;justify-content:center;padding:12%}
+.g>*{width:100%;height:100%}
+#msg{text-align:center;padding:20px;color:#aaa}
+</style></head><body>
+<div id="msg">جاري التحميل...</div><div id="grid"></div>
+<script>
+// يعرض أي هدية: giftIcon(عنصر, عنصر المانيفست)  —  انسخ هذي الدالة لألعابك
+function giftIcon(el,g){
+  if(g.type==='lottie'){
+    lottie.loadAnimation({container:el,renderer:'svg',loop:true,autoplay:true,path:'gifts/'+g.file});
+  }else{
+    var i=new Image();i.src='gifts/'+g.file;el.appendChild(i);
+  }
+}
+fetch('gifts/gifts.json').then(function(r){return r.json()}).then(function(list){
+  document.getElementById('msg').textContent=list.length+' gifts';
+  var grid=document.getElementById('grid');
+  list.forEach(function(g){var d=document.createElement('div');d.className='g';grid.appendChild(d);giftIcon(d,g)});
+}).catch(function(e){document.getElementById('msg').textContent='ما لكيت gifts/gifts.json — شغل السكربت أول وارفع المجلد ('+e+')'});
+</script></body></html>
