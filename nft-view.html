@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NFT gifts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<style>
+body{margin:0;background:#141414;color:#fff;font-family:Arial,sans-serif}
+#top{position:sticky;top:0;background:#141414;padding:10px 14px;z-index:5;max-width:480px;margin:auto}
+#q{width:100%;box-sizing:border-box;background:#2a2a2d;border:0;border-radius:14px;color:#fff;padding:12px 14px;font-size:16px;outline:0}
+#msg{text-align:center;padding:8px;color:#aaa;font-size:14px}
+#grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px 14px 40px;max-width:480px;margin:auto}
+.it{text-align:center;font-size:10px;color:#bbb}
+.g{aspect-ratio:1;border-radius:50%;background:#2a2a2d;padding:12%;margin-bottom:4px}
+.g>*{width:100%;height:100%}
+.it span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+</style></head><body>
+<div id="top"><input id="q" placeholder="ابحث باسم الهدية..."><div id="msg">جاري التحميل...</div></div>
+<div id="grid"></div>
+<script>
+// NFT = كل الهدايا (اسم -> Lottie JSON). تقرأ nft-all-1.txt و nft-all-2.txt ... تلقائياً
+// للاستعمال بالألعاب:  giftIcon(عنصر, NFT["Trojan Horse"])
+var NFT={}, anims=new WeakMap();
+function giftIcon(el,data){return lottie.loadAnimation({container:el,renderer:'svg',loop:true,autoplay:true,animationData:data})}
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    var el=e.target;
+    if(e.isIntersecting){ if(!anims.has(el)) anims.set(el,giftIcon(el,NFT[el.dataset.n])); }
+    else if(anims.has(el)){ anims.get(el).destroy(); anims.delete(el); el.innerHTML=''; }
+  });
+},{rootMargin:'200px'});
+function render(){
+  var grid=document.getElementById('grid'), f=document.getElementById('q').value.toLowerCase();
+  grid.innerHTML='';
+  Object.keys(NFT).filter(function(n){return n.toLowerCase().indexOf(f)>-1}).forEach(function(n){
+    var w=document.createElement('div');w.className='it';
+    var g=document.createElement('div');g.className='g';g.dataset.n=n;
+    var s=document.createElement('span');s.textContent=n;
+    w.appendChild(g);w.appendChild(s);grid.appendChild(w);io.observe(g);
+  });
+  document.getElementById('msg').textContent=Object.keys(NFT).length+' gifts';
+}
+document.getElementById('q').addEventListener('input',render);
+(function load(i){
+  fetch('nft-all-'+i+'.txt').then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){
+    var d=JSON.parse(t);Object.keys(d).forEach(function(k){NFT[k]=d[k]});
+    document.getElementById('msg').textContent='تحميل... '+Object.keys(NFT).length;
+    render();load(i+1);
+  }).catch(function(){
+    if(!Object.keys(NFT).length)document.getElementById('msg').textContent='ما لكيت nft-all-1.txt';
+    else render();
+  });
+})(1);
+</script></body></html>
