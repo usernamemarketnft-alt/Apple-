@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gifts test</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<style>
+body{margin:0;background:#141414;color:#fff;font-family:Arial,sans-serif}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px;max-width:480px;margin:auto}
+.g{aspect-ratio:1;border-radius:50%;background:#2a2a2d;padding:12%}
+.g>*{width:100%;height:100%}
+#msg{text-align:center;padding:20px;color:#aaa}
+</style></head><body>
+<div id="msg">جاري التحميل...</div><div id="grid"></div>
+<script>
+// كل الهدايا بملف واحد: gifts-all.txt  (id -> Lottie JSON)
+// الاستعمال بأي لعبة: giftIcon(عنصر, GIFTS[id])
+var GIFTS={};
+function giftIcon(el,data){
+  lottie.loadAnimation({container:el,renderer:'svg',loop:true,autoplay:true,animationData:data});
+}
+fetch('gifts-all.txt').then(function(r){return r.text()}).then(function(t){
+  GIFTS=JSON.parse(t);
+  var ids=Object.keys(GIFTS);
+  document.getElementById('msg').textContent=ids.length+' gifts';
+  var grid=document.getElementById('grid');
+  ids.forEach(function(id){var d=document.createElement('div');d.className='g';grid.appendChild(d);giftIcon(d,GIFTS[id])});
+}).catch(function(e){document.getElementById('msg').textContent='ما لكيت gifts-all.txt ('+e+')'});
+</script></body></html>
